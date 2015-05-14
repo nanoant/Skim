@@ -917,6 +917,7 @@ static BOOL isIgnorablePOSIXError(NSError *error) {
 }
 
 - (BOOL)revertToContentsOfURL:(NSURL *)absoluteURL ofType:(NSString *)typeName error:(NSError **)outError{
+#if USE_REVERT_SHEET
     NSWindow *mainWindow = [[self mainWindowController] window];
     NSWindow *sheet = nil;
     
@@ -926,7 +927,8 @@ static BOOL isIgnorablePOSIXError(NSError *error) {
         [NSApp beginSheet:sheet modalForWindow:mainWindow modalDelegate:nil didEndSelector:NULL contextInfo:NULL];
         [(SKApplication *)NSApp setUserAttentionDisabled:NO];
     }
-    
+#endif
+
     BOOL success = [super revertToContentsOfURL:absoluteURL ofType:typeName error:outError];
     
     if (success) {
@@ -939,12 +941,14 @@ static BOOL isIgnorablePOSIXError(NSError *error) {
     
     SKDESTROY(tmpData);
     
+#if USE_REVERT_SHEET
     if (sheet) {
         [NSApp endSheet:sheet];
         [sheet orderOut:nil];
         [sheet release];
     }
-    
+#endif
+
     return success;
 }
 
